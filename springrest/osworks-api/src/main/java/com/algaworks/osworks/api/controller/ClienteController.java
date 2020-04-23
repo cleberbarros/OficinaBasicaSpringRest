@@ -1,11 +1,8 @@
 package com.algaworks.osworks.api.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.osworks.domain.model.Cliente;
 import com.algaworks.osworks.domain.repository.ClienteRepository;
+import com.algaworks.osworks.domain.service.CadastroClienteService;
 
 
 
@@ -38,9 +35,11 @@ public class ClienteController {
 	@Autowired
 	private ClienteRepository clienteRepository;
 	
+	@Autowired
+	private CadastroClienteService cadastroCliente;
+	
 	@GetMapping
 	public List<Cliente> listar() {
-	
 		return clienteRepository.findAll();
 		//return clienteRepository.findByNome("Ana Carla");
 		//return clienteRepository.findByNomeContaining("Cl");
@@ -62,9 +61,8 @@ public class ClienteController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)  //Anotação para retornar a resposta como 201 Created
 	public Cliente adicionar(@Valid @RequestBody Cliente cliente ) {  //A anotação @RequestBody pega o Json que vier e transformar em um objeto Cliente
-		
-		
-		return clienteRepository.save(cliente);
+	
+		return cadastroCliente.salvar(cliente);
 	}
 	
 	@PutMapping("/{clienteId}")
@@ -76,7 +74,7 @@ public class ClienteController {
 		}
 		
 		cliente.setId(clienteId);
-		cliente = clienteRepository.save(cliente);
+		cliente = cadastroCliente.salvar(cliente);
 		
 		return ResponseEntity.ok(cliente);
 	}
@@ -88,7 +86,8 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clienteRepository.deleteById(id);
+
+		cadastroCliente.excluir(id);
 		
 		return ResponseEntity.noContent().build();  //passando o Status 204 No Content
 		
