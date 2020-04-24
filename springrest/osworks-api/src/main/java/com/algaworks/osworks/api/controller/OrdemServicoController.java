@@ -2,9 +2,11 @@ package com.algaworks.osworks.api.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +33,19 @@ public class OrdemServicoController {
 	@Autowired
 	private OrdemServicoRepository ordemServicoRepository; //Ele faz injeção direto do repository pq segundo ele não tem validações para pesquisas
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public OrdemServico criar(@Valid @RequestBody OrdemServico ordemServico) {  //@Valid para ativar os Bean validation
-		return gestaoOrdemServico.criar(ordemServico);
+	public OrdemServicoModel criar(@Valid @RequestBody OrdemServico ordemServico) {  //@Valid para ativar os Bean validation
+		return toModel( gestaoOrdemServico.criar(ordemServico));
 	}
 	
 	@GetMapping
-	public List<OrdemServico> listar(){
-		return ordemServicoRepository.findAll();
+	public List<OrdemServicoModel> listar(){
+		//return ordemServicoRepository.findAll();
+		return toCollectionModel(ordemServicoRepository.findAll());
 	}
 	
 	
@@ -49,11 +55,28 @@ public class OrdemServicoController {
 		
 		if(ordemServico.isPresent()) {
 			
-			OrdemServicoModel model = null;
-			return ResponseEntity.ok(model);
+			OrdemServicoModel ordemServicoModel = toModel(ordemServico.get());
+			
+			//OrdemServicoModel ordemServicoModel = modelMapper.map(ordemServico.get(), OrdemServicoModel.class);
+			
+			/* Usando o ModelMapper ele pega o objeto do tipo OrdemServico retornado por ordemServico.get e 
+			 * transforma diretamente em um objeto do tipo OrdemServicoModel que é nosso DTO tudo isso através do
+			 * map feito em modelMapper.map*/
+			return ResponseEntity.ok(ordemServicoModel);
 		}
 		
 		return ResponseEntity.notFound().build();
 		
+	}
+	
+	//REFATORAMOS O COMANDO ACIMA: OrdemServicoModel ordemServicoModel = modelMapper.map(ordemServico.get(), OrdemServicoModel.class);
+	private OrdemServicoModel toModel (OrdemServico ordemServico) {
+		return modelMapper.map(ordemServico, OrdemServicoModel.class);
+	}
+	
+	private List<OrdemServicoModel> toCollectionModel(List<OrdemServico> ordensServico){
+		return ordensServico.stream()
+				.map(ordemServico -> toModel(ordemServico))
+				.collect(Collectors.toList());
 	}
 }
