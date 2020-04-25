@@ -15,7 +15,7 @@ import com.algaworks.osworks.domain.ValidationGroups;
 @Entity
 public class Cliente {
 	
-	@NotNull(groups = ValidationGroups.ClienteId.class)
+	//@NotNull(groups = ValidationGroups.ClienteId.class) - foi removido veja comentario "IMPORTANTE" em OrdemServico do model
 	@Id
 	@GeneratedValue(strategy =  GenerationType.IDENTITY)
 	private Long id;

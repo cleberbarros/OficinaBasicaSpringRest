@@ -3,6 +3,8 @@ package com.algaworks.osworks.domain.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,6 +22,7 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import com.algaworks.osworks.domain.ValidationGroups;
+import com.algaworks.osworks.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -35,26 +39,37 @@ public class OrdemServico {
 	 					para o Id: @NotNull(groups = ValidationGroups.ClienteId.class) sendo assim o OrdemServico valida caso seja passado o Cliente sem ID mas ao cadastro o cliente
 	 					não sendo informado o Id será gerado automaticamente pois essa BeanValidation de Notnull para ID só vai rolar com o group definido aqui através da Interface
 	 					que foi craida ValidationGroups, essa interface esta criada no packagem domain*/
-	@NotNull
+	
+	
+	/*IMPORTANTE: Como para OrdemServico estamos usando o Representation Model (veja o package api.model) e lá na classe 
+	 * OrdemServicoInput estão as validações não se faz mais necessario ter as Bean Validation aqui no Model que será 
+	 * persistido no banco, só faria sentindo se fosse ser cadastrado , persistido no banco de dados sem ser através da API 
+	 * e do Representation Model OndemServicoInput
+	*/
+	//@NotNull
 	@ManyToOne
 	//@JoinColumn(name = "id_cliente")  // não usando @JoinColum por padrão a columa na tabela do BD fica cliente_id
 	private Cliente cliente;
 	
-	@NotBlank
+	//@NotBlank
 	private String descricao;
 	
-	@NotNull
+	//@NotNull
 	private BigDecimal preco;
 	
-	@JsonProperty(access = Access.READ_ONLY)
+	//@JsonProperty(access = Access.READ_ONLY) //retirado por conta da explicação no comentario acima "IMPORTANTE"
 	@Enumerated(EnumType.STRING)
 	private StatusOrdemServico status;
 	
-	@JsonProperty(access = Access.READ_ONLY)
+	//@JsonProperty(access = Access.READ_ONLY)
 	private OffsetDateTime dataAbertura;
 	
-	@JsonProperty(access = Access.READ_ONLY)  // com essa anotação impeço que venham dados via Json para a propriedade
+	//@JsonProperty(access = Access.READ_ONLY)  // com essa anotação impeço que venham dados via Json para a propriedade
 	private OffsetDateTime dataFinalizacao;
+	
+	@OneToMany (mappedBy = "ordemServico")
+	private List<Comentario> comentarios = new ArrayList<>();
+	
 	public Long getId() {
 		return id;
 	}
@@ -97,6 +112,15 @@ public class OrdemServico {
 	public void setDataFinalizacao(OffsetDateTime dataFinalizacao) {
 		this.dataFinalizacao = dataFinalizacao;
 	}
+
+	public List<Comentario> getComentarios() {
+		return comentarios;
+	}
+	public void setComentarios(List<Comentario> comentarios) {
+		this.comentarios = comentarios;
+	}
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -121,5 +145,21 @@ public class OrdemServico {
 		return true;
 	}
 	
+	public boolean podeSerFianlizada() {
+		return StatusOrdemServico.ABERTA.equals(getStatus());
+	}
 	
+	public boolean naoPodeSerFinalizada() {
+		return !podeSerFianlizada();
+	}
+	
+	public void finalizar() {
+		
+		if ( naoPodeSerFinalizada()) {
+			throw new NegocioException("Ordem de serviço não pode ser finalizada!");
+		}
+		setStatus(StatusOrdemServico.FINALIZADA);
+		setDataFinalizacao(OffsetDateTime.now());
+		
+	}
 }

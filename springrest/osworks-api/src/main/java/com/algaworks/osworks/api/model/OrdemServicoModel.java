@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import com.algaworks.osworks.domain.model.StatusOrdemServico;
 
 
-/*Essa classe é uma representação do modelo do nosso recurso OrdemServico, usando esse padrão
+/*Essa classe é uma representação do modelo(REPRESENTANTION MODEL) do nosso recurso OrdemServico, usando esse padrão
   conseguimos especificar quais informações iremos disponibilizar, mostrar em nossa API. Essa classe é uma
   Representantion Model ou seja uma representação do Modelo, diferente da outra classe domain.OrdemServico que é o 
   model em si. Esse é exatamente o Padrão DTO, dessa forma se blinda a API evidanto acesso diretamente ao Model e 
@@ -14,7 +14,8 @@ import com.algaworks.osworks.domain.model.StatusOrdemServico;
  */
 public class OrdemServicoModel {
 	private Long id;
-	private String nomeCliente;
+	//private String nomeCliente;
+	private ClienteResumoModel cliente;
 	private String descricao;
 	private BigDecimal preco;
 	private StatusOrdemServico status;
@@ -26,12 +27,13 @@ public class OrdemServicoModel {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getNomeCliente() {
+	
+	/*public String getNomeCliente() {
 		return nomeCliente;
 	}
 	public void setNomeCliente(String nomeCliente) {
 		this.nomeCliente = nomeCliente;
-	}
+	}*/
 	public String getDescricao() {
 		return descricao;
 	}
@@ -62,6 +64,13 @@ public class OrdemServicoModel {
 	public void setDataFinalizacao(OffsetDateTime dataFinalizacao) {
 		this.dataFinalizacao = dataFinalizacao;
 	}
+	public ClienteResumoModel getCliente() {
+		return cliente;
+	}
+	public void setCliente(ClienteResumoModel cliente) {
+		this.cliente = cliente;
+	}
+	
 	
 	
 }
