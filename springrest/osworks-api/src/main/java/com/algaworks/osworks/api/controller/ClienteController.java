@@ -28,7 +28,7 @@ import com.algaworks.osworks.domain.service.CadastroClienteService;
 @RequestMapping("/clientes") //Esse anotação define que esse controlador irá responder sempre a /clientes
 public class ClienteController {
 
-	//NÃO PRECISO MAIS AO USAR O REPOSITORY
+	//NÃO PRECISO MAIS injetar o EntityManager AO USAR O REPOSITORY
 //	@PersistenceContext
 //	private EntityManager manager;
 	

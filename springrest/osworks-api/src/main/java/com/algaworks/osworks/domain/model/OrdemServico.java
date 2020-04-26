@@ -33,8 +33,8 @@ public class OrdemServico {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)  
 	private Long id;
 	
-	@Valid //colocando aqui aciona o Bean Validation na model Cliente 
-	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class ) /*
+	/*@Valid //colocando aqui aciona o Bean Validation na model Cliente 
+	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class ) 
 	 					Essa anotação foi necessaria para criar um grupo em comum com a model Cliente, se entrar em Cliente veja que lá o atributo Id esta com a seguindo anotação:
 	 					para o Id: @NotNull(groups = ValidationGroups.ClienteId.class) sendo assim o OrdemServico valida caso seja passado o Cliente sem ID mas ao cadastro o cliente
 	 					não sendo informado o Id será gerado automaticamente pois essa BeanValidation de Notnull para ID só vai rolar com o group definido aqui através da Interface
